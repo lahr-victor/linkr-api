@@ -1,9 +1,14 @@
 import postsRepository from '../repositories/posts.repository.js';
 
+function extractHashtags(text) {
+  if (!text) return [];
+  return Array.from(new Set(text.match(/(?<=#)\S+/g)));
+}
+
 async function createNewPost(req, res) {
   const { description } = req.body;
   try {
-    const hashtags = Array.from(new Set(description.match(/(?<=#)\S+/g)));
+    const hashtags = extractHashtags(description);
     const post = await postsRepository.create({
       ...req.body,
       userId: 1,
