@@ -7,15 +7,15 @@ const customMessages = {
   'string.min': '{#label} deve ter no mínimo {#limit} caracteres',
   'any.required': '{#label} é um campo obrigatório',
   'any.only': '{#label} deve ser igual a {#valids}',
+  'string.uri': '{#label} deve ser uma URL válida com o formato http:// ou https://',
 };
 
 export const userSchema = joi.object({
-  name: joi.string().required().messages(customMessages),
   email: joi.string().email().required().messages(customMessages),
-  photo: joi.string().required().messages(customMessages),
   password: joi.string().required().min(3).messages(customMessages),
-  confirmPassword: joi.string()
-    .valid(joi.ref('password'))
+  name: joi.string().required().messages(customMessages),
+  photo: joi.string()
+    .uri({ scheme: ['http', 'https'] })
     .required()
     .messages(customMessages),
 });
