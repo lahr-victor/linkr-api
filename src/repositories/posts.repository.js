@@ -44,7 +44,15 @@ async function create({
 
 async function findAll({ limit = 20 }) {
   const { rows } = await db.query(
-    'SELECT * FROM posts ORDER BY "createdAt" DESC LIMIT $1;',
+    `SELECT 
+      posts.id,
+      posts.description,
+      posts.url, 
+      users.name AS "userName",
+      users.photo AS "userImageUrl",
+      users.id AS "userId"
+      FROM posts JOIN users ON users.id=posts."userId" 
+    ORDER BY posts."createdAt" DESC LIMIT $1;`,
     [limit],
   );
   return rows;
