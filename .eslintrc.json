@@ -9,6 +9,8 @@
   },
   "rules": {
     "import/extensions": "off",
-    "no-console": "off"
+    "no-console": "off",
+    "no-restricted-syntax": "off",
+    "no-await-in-loop": "off"
   }
 }
