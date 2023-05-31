@@ -2,7 +2,7 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import db from '../database/database.connection.js';
 
-export async function signUp(req, res) {
+async function signUp(req, res) {
   const {
     name, email, photo, password,
   } = req.body;
@@ -28,7 +28,7 @@ export async function signUp(req, res) {
   }
 }
 
-export async function signIn(req, res) {
+async function signIn(req, res) {
   const { email, password } = req.body;
 
   try {
@@ -58,7 +58,7 @@ export async function signIn(req, res) {
   }
 }
 
-export async function logOut(req, res) {
+async function logOut(req, res) {
   const { sessionUserId } = res.locals;
   try {
     const deletedSession = await db.query('DELETE FROM sessions WHERE "userId"=$1;', [sessionUserId]);
@@ -68,3 +68,11 @@ export async function logOut(req, res) {
     return res.status(422).send(err.message);
   }
 }
+
+const userControllers = {
+  signUp,
+  signIn,
+  logOut,
+};
+
+export default userControllers;
