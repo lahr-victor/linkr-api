@@ -7,12 +7,12 @@ function extractHashtags(text) {
 
 async function createNewPost(req, res) {
   const { description } = req.body;
-  const { sessionUserId } = res.locals;
+  const { userId } = res.locals.session;
   try {
     const hashtags = extractHashtags(description);
     const post = await postsRepository.create({
       ...req.body,
-      userId: sessionUserId,
+      userId,
       hashtags,
     });
     res.status(201).send(post);
@@ -34,12 +34,12 @@ async function getPosts(req, res) {
 
 async function deletePost(req, res) {
   const { postId } = req.params;
-  const { sessionUserId } = res.locals;
+  const { userId } = res.locals.session;
   try {
     const postFound = await postsRepository.find({ postId });
 
     if (!postFound) return res.sendStatus(404);
-    if (postFound.userId !== Number(sessionUserId)) return res.sendStatus(401);
+    if (postFound.userId !== Number(userId)) return res.sendStatus(401);
 
     await postsRepository.deleteById({ postId });
     return res.sendStatus(204);
@@ -50,12 +50,12 @@ async function deletePost(req, res) {
 
 async function updatePost(req, res) {
   const { postId } = req.params;
-  const { sessionUserId } = res.locals;
+  const { userId } = res.locals.session;
   try {
     const postFound = await postsRepository.find({ postId });
 
     if (!postFound) return res.sendStatus(404);
-    if (postFound.userId !== Number(sessionUserId)) return res.sendStatus(401);
+    if (postFound.userId !== Number(userId)) return res.sendStatus(401);
 
     const updatedPost = await postsRepository.update({ postId, ...req.body });
     return res.send(updatedPost);
