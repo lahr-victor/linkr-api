@@ -36,7 +36,7 @@ async function deletePost(req, res) {
   const { postId } = req.params;
   const { sessionUserId } = res.locals;
   try {
-    const postFound = await postsRepository.findById({ postId });
+    const postFound = await postsRepository.find({ postId });
 
     if (!postFound) return res.sendStatus(404);
     if (postFound.userId !== Number(sessionUserId)) return res.sendStatus(401);
@@ -52,7 +52,7 @@ async function updatePost(req, res) {
   const { postId } = req.params;
   const { sessionUserId } = res.locals;
   try {
-    const postFound = await postsRepository.findById({ postId });
+    const postFound = await postsRepository.find({ postId });
 
     if (!postFound) return res.sendStatus(404);
     if (postFound.userId !== Number(sessionUserId)) return res.sendStatus(401);
