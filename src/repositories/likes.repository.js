@@ -12,6 +12,17 @@ async function add(postId, userId) {
   return rows[0];
 }
 
+async function remove(postId, userId) {
+  const { rows } = await db.query(
+    `
+    DELETE FROM likes WHERE "postId" = $1 AND "userId" = $2;
+    `,
+    [postId, userId],
+  );
+
+  return rows[0];
+}
+
 async function retrieveLatest(postId, quantity, userId) {
   const { rows } = await db.query(
     `
@@ -50,6 +61,7 @@ async function validateUserByPost(postId, userId) {
 
 const likesRepository = {
   add,
+  remove,
   retrieveLatest,
   retrieveTotal,
   validateUserByPost,

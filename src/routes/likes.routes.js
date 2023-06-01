@@ -10,10 +10,10 @@ likesRouter.get(
   likesControllers.retrieveLikes,
 );
 
-likesRouter.post(
-  '/posts/:id/like-it',
+likesRouter.put(
+  '/posts/:id/like',
   authValidation,
-  likesControllers.addLike,
+  likesControllers.updateLikes,
 );
 
 export default likesRouter;
