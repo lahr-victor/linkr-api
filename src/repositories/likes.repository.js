@@ -1,5 +1,17 @@
 import db from '../database/database.connection.js';
 
+async function add(postId, userId) {
+  const { rows } = await db.query(
+    `
+    INSERT INTO likes ("postId", "userId")
+    VALUES ($1, $2);
+    `,
+    [postId, userId],
+  );
+
+  return rows[0];
+}
+
 async function retrieveLatest(postId, quantity, userId) {
   const { rows } = await db.query(
     `
@@ -36,6 +48,11 @@ async function validateUserByPost(postId, userId) {
   return rows[0].exists;
 }
 
-const likesRepository = { retrieveLatest, retrieveTotal, validateUserByPost };
+const likesRepository = {
+  add,
+  retrieveLatest,
+  retrieveTotal,
+  validateUserByPost,
+};
 
 export default likesRepository;
