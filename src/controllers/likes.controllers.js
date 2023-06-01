@@ -13,11 +13,13 @@ async function retrieveLikes(req, res) {
   const namedLikes = 2;
 
   try {
+    const isLiked = await likesRepository.validateUserByPost(postId, userId);
+
     const latestLikes = await likesRepository.retrieveLatest(postId, namedLikes, userId);
 
     const totalLikes = await likesRepository.retrieveTotal(postId);
 
-    return res.status(200).send({ latestLikes, totalLikes });
+    return res.status(200).send({ isLiked, latestLikes, totalLikes });
   } catch (err) {
     return res.status(500).send(err.message);
   }

@@ -25,6 +25,17 @@ async function retrieveTotal(postId) {
   return rows[0].totalLikes;
 }
 
-const likesRepository = { retrieveLatest, retrieveTotal };
+async function validateUserByPost(postId, userId) {
+  const { rows } = await db.query(
+    `
+    SELECT EXISTS (SELECT * FROM likes WHERE "postId" = $1 AND "userId" = $2);
+    `,
+    [postId, userId],
+  );
+
+  return rows[0].exists;
+}
+
+const likesRepository = { retrieveLatest, retrieveTotal, validateUserByPost };
 
 export default likesRepository;
