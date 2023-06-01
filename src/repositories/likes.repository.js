@@ -10,15 +10,18 @@ async function retrieveLatest(postId, quantity, userId) {
     `,
     [postId, quantity, userId],
   );
-  console.log(rows);
+
   return rows;
 }
 
 async function retrieveTotal(postId) {
   const { rows } = await db.query(
-    'SELECT COUNT("userId") AS "totalLikes" FROM likes WHERE "postId" = $1;',
+    `
+    SELECT COUNT("userId") AS "totalLikes" FROM likes WHERE "postId" = $1;
+    `,
     [postId],
   );
+
   return rows[0].totalLikes;
 }
 

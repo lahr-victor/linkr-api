@@ -14,6 +14,7 @@ async function retrieveLikes(req, res) {
 
   try {
     const latestLikes = await likesRepository.retrieveLatest(postId, namedLikes, userId);
+
     const totalLikes = await likesRepository.retrieveTotal(postId);
 
     return res.status(200).send({ latestLikes, totalLikes });
