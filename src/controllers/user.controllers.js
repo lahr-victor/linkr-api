@@ -1,6 +1,6 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import db from '../database/database.connection.js';
+import userRepository from '../repositories/user.repository.js';
 
 async function signUp(req, res) {
   const {
@@ -10,17 +10,14 @@ async function signUp(req, res) {
   const passwordHash = bcrypt.hashSync(password, 10);
 
   try {
-    const existingUser = await db.query('SELECT * FROM users WHERE email=$1;', [email]);
+    const existingUser = await userRepository.findUser(email);
 
-    if (existingUser.rowCount > 0) {
+    if (existingUser) {
       return res.status(409)
         .send('Já existe uma conta com esse e-mail');
     }
 
-    await db.query(`
-        INSERT INTO users (name, email, photo, password)
-        VALUES ($1, $2, $3, $4);
-    `, [name, email, photo, passwordHash]);
+    await userRepository.createUser(name, email, photo, passwordHash);
 
     return res.sendStatus(201);
   } catch (err) {
@@ -32,25 +29,23 @@ async function signIn(req, res) {
   const { email, password } = req.body;
 
   try {
-    const user = await db.query('SELECT * FROM users WHERE email=$1;', [email]);
-    const passwordMatch = user.rows[0].password;
+    const user = await userRepository.findUser(email);
 
-    if (user.rows[0] && bcrypt.compareSync(password, passwordMatch)) {
-      const existingSession = await db.query('SELECT * FROM sessions WHERE "userId"=$1;', [user.rows[0].id]);
+    if (!user) return res.status(401).send('Não existe uma conta com esse e-mail');
 
-      if (existingSession.rowCount > 0) {
-        return res.status(400).send('Usuário já logado');
-      }
+    const passwordMatch = user.password;
 
-      await db.query(`
-            INSERT INTO sessions ("userId")
-            VALUES ($1);`, [user.rows[0].id]);
+    if (user && bcrypt.compareSync(password, passwordMatch)) {
+      const existingSession = await userRepository.findSession(user.id);
+
+      if (existingSession) return res.status(400).send('Usuário já logado');
+
+      await userRepository.createSession(user.id);
 
       const key = process.env.SECRET_KEY;
-      const session = await db.query('SELECT * FROM sessions WHERE "userId"=$1', [user.rows[0].id]);
-      const token = jwt.sign(session.rows[0].userId, key);
+      const token = jwt.sign(user.id, key);
 
-      return res.status(200).send({ token });
+      return res.status(200).send({ token, user });
     }
     return res.status(401).send('E-mail ou senha incorretos');
   } catch (err) {
@@ -60,10 +55,10 @@ async function signIn(req, res) {
 
 async function logOut(req, res) {
   const { userId } = res.locals.session;
+
   try {
-    const deletedSession = await db.query('DELETE FROM sessions WHERE "userId"=$1;', [userId]);
-    if (deletedSession.rowCount === 0) return res.sendStatus(400);
-    return res.status(200).send(deletedSession);
+    await userRepository.deleteSession(userId);
+    return res.sendStatus(200);
   } catch (err) {
     return res.status(422).send(err.message);
   }
