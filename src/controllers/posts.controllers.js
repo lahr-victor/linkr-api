@@ -7,11 +7,12 @@ function extractHashtags(text) {
 
 async function createNewPost(req, res) {
   const { description } = req.body;
+  const { sessionUserId } = res.locals;
   try {
     const hashtags = extractHashtags(description);
     const post = await postsRepository.create({
       ...req.body,
-      userId: 1,
+      userId: sessionUserId,
       hashtags,
     });
     res.status(201).send(post);
@@ -31,6 +32,43 @@ async function getPosts(req, res) {
   }
 }
 
-const postsControllers = { createNewPost, getPosts };
+async function deletePost(req, res) {
+  const { postId } = req.params;
+  const { sessionUserId } = res.locals;
+  try {
+    const postFound = await postsRepository.findById({ postId });
+
+    if (!postFound) return res.sendStatus(404);
+    if (postFound.userId !== Number(sessionUserId)) return res.sendStatus(401);
+
+    await postsRepository.deleteById({ postId });
+    return res.sendStatus(204);
+  } catch (err) {
+    return res.sendStatus(500);
+  }
+}
+
+async function updatePost(req, res) {
+  const { postId } = req.params;
+  const { sessionUserId } = res.locals;
+  try {
+    const postFound = await postsRepository.findById({ postId });
+
+    if (!postFound) return res.sendStatus(404);
+    if (postFound.userId !== Number(sessionUserId)) return res.sendStatus(401);
+
+    const updatedPost = await postsRepository.update({ postId, ...req.body });
+    return res.send(updatedPost);
+  } catch (err) {
+    return res.sendStatus(500);
+  }
+}
+
+const postsControllers = {
+  createNewPost,
+  getPosts,
+  deletePost,
+  updatePost,
+};
 
 export default postsControllers;
