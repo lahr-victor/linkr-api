@@ -2,15 +2,21 @@ import likesRepository from '../repositories/likes.repository.js';
 import postsRepository from '../repositories/posts.repository.js';
 
 async function retrieveLikes(req, res) {
+  const { userId } = res.locals.session;
+
   const postId = parseInt(req.params.id, 10);
   if (Number.isNaN(postId)) return res.sendStatus(400);
 
   const post = await postsRepository.find(postId);
   if (!post) return res.sendStatus(404);
 
+  const namedLikes = 2;
+
   try {
+    const latestLikes = await likesRepository.retrieveLatest(postId, namedLikes, userId);
     const totalLikes = await likesRepository.retrieveTotal(postId);
-    return res.status(200).send(totalLikes);
+
+    return res.status(200).send({ latestLikes, totalLikes });
   } catch (err) {
     return res.status(500).send(err.message);
   }
