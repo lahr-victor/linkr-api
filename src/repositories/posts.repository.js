@@ -44,26 +44,43 @@ async function create({
 
 async function findAll({ limit = 20 }) {
   const { rows } = await db.query(
-    `
-    SELECT posts.id, posts.url, posts.description, posts."userId", users.name, users.photo
-    FROM posts
-    JOIN users ON posts."userId" = users.id
-    ORDER BY "createdAt"
-    DESC LIMIT $1;
-    `,
+    `SELECT 
+      posts.id,
+      posts.description,
+      posts.url, 
+      users.name AS "userName",
+      users.photo AS "userImageUrl",
+      users.id AS "userId"
+    FROM posts JOIN users ON users.id=posts."userId" 
+    ORDER BY posts."createdAt" DESC LIMIT $1;`,
     [limit],
   );
   return rows;
 }
 
-async function find(postId) {
+async function find({ postId }) {
+  const { rows } = await db.query('SELECT * FROM posts WHERE id=$1;', [postId]);
+  return rows[0];
+}
+
+async function deleteById({ postId }) {
+  await db.query('DELETE FROM posts WHERE id=$1;', [postId]);
+}
+
+async function update({ postId, url, description }) {
   const { rows } = await db.query(
-    'SELECT * FROM posts WHERE id = $1;',
-    [postId],
+    'UPDATE posts SET url=$1, description=$2 WHERE id=$3 RETURNING *;',
+    [url, description, postId],
   );
   return rows[0];
 }
 
-const postsRepository = { create, findAll, find };
+const postsRepository = {
+  create,
+  findAll,
+  deleteById,
+  update,
+  find,
+};
 
 export default postsRepository;
