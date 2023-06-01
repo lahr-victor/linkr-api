@@ -59,9 +59,9 @@ async function signIn(req, res) {
 }
 
 async function logOut(req, res) {
-  const { sessionUserId } = res.locals;
+  const { userId } = res.locals.session;
   try {
-    const deletedSession = await db.query('DELETE FROM sessions WHERE "userId"=$1;', [sessionUserId]);
+    const deletedSession = await db.query('DELETE FROM sessions WHERE "userId"=$1;', [userId]);
     if (deletedSession.rowCount === 0) return res.sendStatus(400);
     return res.status(200).send(deletedSession);
   } catch (err) {

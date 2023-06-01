@@ -50,6 +50,14 @@ async function findAll({ limit = 20 }) {
   return rows;
 }
 
-const postsRepository = { create, findAll };
+async function find(postId) {
+  const { rows } = await db.query(
+    'SELECT * FROM posts WHERE id = $1;',
+    [postId],
+  );
+  return rows[0];
+}
+
+const postsRepository = { create, findAll, find };
 
 export default postsRepository;
