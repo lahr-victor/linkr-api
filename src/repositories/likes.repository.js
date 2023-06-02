@@ -51,7 +51,7 @@ async function retrieveTotal(postId) {
 async function validateUserByPost(postId, userId) {
   const { rows } = await db.query(
     `
-    (SELECT * FROM likes WHERE "postId" = $1 AND "userId" = $2);
+    SELECT EXISTS (SELECT * FROM likes WHERE "postId" = $1 AND "userId" = $2);
     `,
     [postId, userId],
   );
