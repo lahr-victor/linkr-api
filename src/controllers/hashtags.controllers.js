@@ -15,6 +15,17 @@ async function retrievePosts(req, res) {
   }
 }
 
-const hashtagsControllers = { retrievePosts };
+async function retrieveTrending(req, res) {
+  try {
+    const limit = 10;
+    const hashtags = await hashtagsRepository.retrieveMostUsed(limit);
+
+    return res.status(200).send(hashtags);
+  } catch (err) {
+    return res.status(500).send(err.message);
+  }
+}
+
+const hashtagsControllers = { retrievePosts, retrieveTrending };
 
 export default hashtagsControllers;

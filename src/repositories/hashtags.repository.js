@@ -1,5 +1,18 @@
 import db from '../database/database.connection.js';
 
+async function retrieveMostUsed(limit) {
+  const { rows } = await db.query(
+    `
+    SELECT hashtag, COUNT(hashtag) AS "quantity" FROM hashtags
+    WHERE "createdAt" >= NOW() - INTERVAL '1 DAY'
+    GROUP BY hashtag ORDER BY quantity DESC, hashtag LIMIT $1;
+    `,
+    [limit],
+  );
+
+  return rows;
+}
+
 async function retrievePostsBy(hashtag) {
   const { rows } = await db.query(
     `
@@ -33,6 +46,7 @@ async function validate(hashtag) {
 }
 
 const hashtagsRepository = {
+  retrieveMostUsed,
   retrievePostsBy,
   validate,
 };

@@ -8,4 +8,9 @@ hashtagsRouter.get(
   hashtagsControllers.retrievePosts,
 );
 
+hashtagsRouter.get(
+  '/trending',
+  hashtagsControllers.retrieveTrending,
+);
+
 export default hashtagsRouter;
