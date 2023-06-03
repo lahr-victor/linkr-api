@@ -11,7 +11,7 @@ async function getUserById(req, res) {
 }
 
 async function searchUsersByName(req, res) {
-  const { name } = req.body;
+  const { name } = req.query;
   try {
     const users = await searchRepository.searchUserName(name);
     res.status(200).send(users);
