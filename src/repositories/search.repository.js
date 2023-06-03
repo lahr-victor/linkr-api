@@ -1,20 +1,14 @@
 import db from '../database/database.connection.js';
 
 async function searchUserName(name) {
-  const ilikePattern = `%${name}%`;
+  const pattern = `%${name}%`;
 
-  const { rows } = await db.query(
-    `
-      SELECT
-        users.id, users.name, users.photo
-        FROM
-        users
-        WHERE
-        users.name ILIKE $1
-      ;`,
-    [ilikePattern],
+  const users = await db.query(
+    'SELECT id, name, photo FROM users WHERE name ILIKE $1;',
+    [pattern],
   );
-  return rows;
+
+  return users.rows;
 }
 
 async function searchUserId(id) {
