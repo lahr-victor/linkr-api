@@ -7,7 +7,7 @@ async function retrieveLikes(req, res) {
   const postId = parseInt(req.params.id, 10);
   if (Number.isNaN(postId)) return res.sendStatus(400);
 
-  const post = await postsRepository.find(postId);
+  const post = await postsRepository.find({ postId });
   if (!post) return res.sendStatus(404);
 
   const namedLikes = 2;
