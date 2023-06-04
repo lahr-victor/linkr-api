@@ -40,7 +40,7 @@ async function retrieveLatest(postId, quantity, userId) {
 async function retrieveTotal(postId) {
   const { rows } = await db.query(
     `
-    SELECT COUNT("userId") AS "totalLikes" FROM likes WHERE "postId" = $1;
+    SELECT COUNT("userId")::INT AS "totalLikes" FROM likes WHERE "postId" = $1;
     `,
     [postId],
   );

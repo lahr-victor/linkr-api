@@ -58,7 +58,7 @@ async function findAll({ limit = 20 }) {
   return rows;
 }
 
-async function find({ postId }) {
+async function find(postId) {
   const { rows } = await db.query('SELECT * FROM posts WHERE id=$1;', [postId]);
   return rows[0];
 }
