@@ -4,7 +4,7 @@ import hashtagsControllers from '../controllers/hashtags.controllers.js';
 const hashtagsRouter = Router();
 
 hashtagsRouter.get(
-  '/hashtags/:hashtag',
+  '/hashtag/:hashtag',
   hashtagsControllers.retrievePosts,
 );
 
