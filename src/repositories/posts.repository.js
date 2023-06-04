@@ -58,7 +58,7 @@ async function findAll({ limit = 20 }) {
   return rows;
 }
 
-async function find(postId) {
+async function find({ postId }) {
   const { rows } = await db.query('SELECT * FROM posts WHERE id=$1;', [postId]);
   return rows[0];
 }
@@ -75,12 +75,23 @@ async function update({ postId, url, description }) {
   return rows[0];
 }
 
+async function validate(postId) {
+  const { rows } = await db.query(
+    `
+    SELECT EXISTS (SELECT * FROM posts WHERE id = $1);
+    `,
+    [postId],
+  );
+  return rows[0].exists;
+}
+
 const postsRepository = {
   create,
   findAll,
   deleteById,
   update,
   find,
+  validate,
 };
 
 export default postsRepository;
