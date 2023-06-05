@@ -64,7 +64,7 @@ async function find({ postId }) {
 }
 
 async function deleteById({ postId }) {
-  await db.query('DELETE FROM posts WHERE id=$1;', [postId]);
+  await db.query('DELETE FROM posts WHERE id = $1;', [postId]);
 }
 
 async function update({ postId, url, description }) {
