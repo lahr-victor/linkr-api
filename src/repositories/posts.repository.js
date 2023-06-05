@@ -64,8 +64,6 @@ async function find({ postId }) {
 }
 
 async function deleteById({ postId }) {
-  await db.query('DELETE FROM likes WHERE "postId" = $1;', [postId]);
-  await db.query('DELETE FROM hashtags WHERE "postId" = $1;', [postId]);
   await db.query('DELETE FROM posts WHERE id = $1;', [postId]);
 }
 
