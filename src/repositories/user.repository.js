@@ -36,6 +36,11 @@ async function unfollowUser(unfollowingId, unfollowerId) {
   await db.query('DELETE FROM follows WHERE "followingId"=$1 AND "followerId"=$2;', [unfollowingId, unfollowerId]);
 }
 
+async function isFollowing(followingId, followerId) {
+  const { rows } = await db.query('SELECT * FROM follows WHERE "followingId"=$1 AND "followerId"=$2;', [followingId, followerId]);
+  return rows[0];
+}
+
 const userRepository = {
   findUser,
   createUser,
@@ -44,6 +49,7 @@ const userRepository = {
   deleteSession,
   followUser,
   unfollowUser,
+  isFollowing,
 };
 
 export default userRepository;
