@@ -62,7 +62,6 @@ async function findAll({ limit = 20 }) {
       posts.url, 
       posts.description,
       posts."createdAt",
-      likes."postId", 
       users.name, 
       users.photo,
       users.id
