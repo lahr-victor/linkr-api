@@ -64,10 +64,55 @@ async function logOut(req, res) {
   }
 }
 
+async function followUser(req, res) {
+  const { userId } = res.locals.session;
+  const followingId = userId;
+  const { followerId } = req.params;
+
+  if (followingId === followerId) return res.status(422).send('Não é possível seguir a si mesmo');
+
+  try {
+    await userRepository.followUser(followingId, followerId);
+    return res.status(200).send(true);
+  } catch (err) {
+    return res.status(422).send(err.message);
+  }
+}
+
+async function unfollowUser(req, res) {
+  const { userId } = res.locals.session;
+  const unfollowingId = userId;
+  const { unfollowerId } = req.params;
+
+  try {
+    await userRepository.unfollowUser(unfollowingId, unfollowerId);
+    return res.status(200).send(false);
+  } catch (err) {
+    return res.status(422).send(err.message);
+  }
+}
+
+async function isFollowing(req, res) {
+  const { userId } = res.locals.session;
+  const followingId = userId;
+  const { followerId } = req.params;
+
+  try {
+    const following = await userRepository.isFollowing(followingId, followerId);
+    if (following) return res.status(200).send(true);
+    return res.status(200).send(false);
+  } catch (err) {
+    return res.status(422).send(err.message);
+  }
+}
+
 const userControllers = {
   signUp,
   signIn,
   logOut,
+  followUser,
+  unfollowUser,
+  isFollowing,
 };
 
 export default userControllers;

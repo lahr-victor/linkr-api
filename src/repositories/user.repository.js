@@ -28,12 +28,28 @@ async function deleteSession(userId) {
   await db.query('DELETE FROM sessions WHERE "userId"=$1;', [userId]);
 }
 
+async function followUser(followingId, followerId) {
+  await db.query('INSERT INTO follows ("followingId", "followerId") VALUES ($1, $2);', [followingId, followerId]);
+}
+
+async function unfollowUser(unfollowingId, unfollowerId) {
+  await db.query('DELETE FROM follows WHERE "followingId"=$1 AND "followerId"=$2;', [unfollowingId, unfollowerId]);
+}
+
+async function isFollowing(followingId, followerId) {
+  const { rows } = await db.query('SELECT * FROM follows WHERE "followingId"=$1 AND "followerId"=$2;', [followingId, followerId]);
+  return rows[0];
+}
+
 const userRepository = {
   findUser,
   createUser,
   findSession,
   createSession,
   deleteSession,
+  followUser,
+  unfollowUser,
+  isFollowing,
 };
 
 export default userRepository;
