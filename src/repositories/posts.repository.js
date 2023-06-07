@@ -42,7 +42,7 @@ async function create({
   return { post, hashtags: hashtagsCreated };
 }
 
-async function findAll({ limit = 20 }) {
+async function findAll({ limit = 20, offset = 0 }) {
   const { rows } = await db.query(
     `SELECT 
       posts.id,
@@ -52,8 +52,8 @@ async function findAll({ limit = 20 }) {
       users.photo AS "userImageUrl",
       users.id AS "userId"
     FROM posts JOIN users ON users.id=posts."userId" 
-    ORDER BY posts."createdAt" DESC LIMIT $1;`,
-    [limit],
+    ORDER BY posts."createdAt" DESC LIMIT $1 OFFSET $2;`,
+    [limit, offset],
   );
   return rows;
 }

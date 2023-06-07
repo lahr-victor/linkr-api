@@ -23,9 +23,9 @@ async function createNewPost(req, res) {
 }
 
 async function getPosts(req, res) {
-  const { limit } = req.query;
+  const { limit, offset } = req.query;
   try {
-    const posts = await postsRepository.findAll({ limit: Number(limit) || 20 });
+    const posts = await postsRepository.findAll({ limit, offset });
     res.send(posts);
   } catch (err) {
     res.sendStatus(500);
