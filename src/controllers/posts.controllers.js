@@ -17,7 +17,6 @@ async function createNewPost(req, res) {
     });
     res.status(201).send(post);
   } catch (err) {
-    console.log(err);
     res.sendStatus(500);
   }
 }
