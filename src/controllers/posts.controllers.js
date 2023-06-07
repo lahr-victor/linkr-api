@@ -24,9 +24,13 @@ async function createNewPost(req, res) {
 async function getPosts(req, res) {
   const { limit, offset } = req.query;
   try {
-    const posts = await postsRepository.findAll({ limit, offset });
+    const posts = await postsRepository.findAll({
+      limit,
+      offset,
+    });
     res.send(posts);
   } catch (err) {
+    console.log(err);
     res.sendStatus(500);
   }
 }

@@ -16,6 +16,11 @@ const create = Joi.object({
     .messages(customMessages),
 });
 
-const postSchema = { create };
+const query = Joi.object({
+  limit: Joi.number().integer().optional(),
+  offset: Joi.number().integer().optional(),
+});
+
+const postSchema = { create, query };
 
 export default postSchema;
