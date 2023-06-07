@@ -24,8 +24,9 @@ async function createNewPost(req, res) {
 
 async function getPosts(req, res) {
   const { limit } = req.query;
+  const { userId } = res.locals.session;
   try {
-    const posts = await postsRepository.findAll({ limit: Number(limit) || 20 });
+    const posts = await postsRepository.findAllByFollow({ limit: Number(limit) || 20 }, userId);
     res.send(posts);
   } catch (err) {
     res.sendStatus(500);

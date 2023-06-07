@@ -26,6 +26,6 @@ postsRouter.put(
   postsControllers.updatePost,
 );
 
-postsRouter.get('/posts', postsControllers.getPosts);
+postsRouter.get('/posts', authValidation, postsControllers.getPosts);
 
 export default postsRouter;
