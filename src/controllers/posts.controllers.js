@@ -17,17 +17,20 @@ async function createNewPost(req, res) {
     });
     res.status(201).send(post);
   } catch (err) {
-    console.log(err);
     res.sendStatus(500);
   }
 }
 
 async function getPosts(req, res) {
-  const { limit } = req.query;
+  const { limit, offset } = req.query;
   try {
-    const posts = await postsRepository.findAll({ limit: Number(limit) || 20 });
+    const posts = await postsRepository.findAll({
+      limit,
+      offset,
+    });
     res.send(posts);
   } catch (err) {
+    console.log(err);
     res.sendStatus(500);
   }
 }
