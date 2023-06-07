@@ -13,4 +13,9 @@ commentsRouter.post(
   commentsControllers.addComment,
 );
 
+commentsRouter.get(
+  '/posts/:id/comments',
+  commentsControllers.retrieveComments,
+);
+
 export default commentsRouter;

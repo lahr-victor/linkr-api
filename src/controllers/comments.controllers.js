@@ -23,6 +23,22 @@ async function addComment(req, res) {
   }
 }
 
-const commentsControllers = { addComment };
+async function retrieveComments(req, res) {
+  const postId = parseInt(req.params.id, 10);
+  if (Number.isNaN(postId)) return res.sendStatus(400);
+
+  const valid = await postsRepository.validate(postId);
+  if (!valid) return res.sendStatus(404);
+
+  try {
+    const comments = await commentsRepository.retrieve(postId);
+
+    return res.status(200).send({ comments });
+  } catch (err) {
+    return res.status(500).send(err.message);
+  }
+}
+
+const commentsControllers = { addComment, retrieveComments };
 
 export default commentsControllers;
