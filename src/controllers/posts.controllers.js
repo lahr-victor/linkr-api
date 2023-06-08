@@ -17,7 +17,6 @@ async function createNewPost(req, res) {
     });
     res.status(201).send(post);
   } catch (err) {
-    console.log(err);
     res.sendStatus(500);
   }
 }
@@ -29,6 +28,7 @@ async function getPosts(req, res) {
     const posts = await postsRepository.findAllByFollow({ limit: Number(limit) || 20 }, userId);
     res.send(posts);
   } catch (err) {
+    console.log(err);
     res.sendStatus(500);
   }
 }

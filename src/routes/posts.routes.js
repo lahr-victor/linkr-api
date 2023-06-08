@@ -26,6 +26,11 @@ postsRouter.put(
   postsControllers.updatePost,
 );
 
-postsRouter.get('/posts', authValidation, postsControllers.getPosts);
+postsRouter.get(
+  '/posts',
+  authValidation,
+  schemaMiddleware.validateQuery(postSchema.query),
+  postsControllers.getPosts,
+);
 
 export default postsRouter;
