@@ -24,13 +24,12 @@ async function createNewPost(req, res) {
 async function getPosts(req, res) {
   const { limit, offset } = req.query;
   try {
-    const posts = await postsRepository.findAll({
+    const posts = await postsRepository.findAllPostsAndReposts({
       limit,
       offset,
     });
     res.send(posts);
   } catch (err) {
-    console.log(err);
     res.sendStatus(500);
   }
 }
@@ -54,13 +53,24 @@ async function deletePost(req, res) {
 async function updatePost(req, res) {
   const { postId } = req.params;
   const { userId } = res.locals.session;
+  const { url, description } = req.body;
   try {
     const postFound = await postsRepository.find({ postId });
 
     if (!postFound) return res.sendStatus(404);
     if (postFound.userId !== Number(userId)) return res.sendStatus(401);
 
-    const updatedPost = await postsRepository.update({ postId, ...req.body });
+    const oldDescription = postFound.description;
+
+    const hashtags = extractHashtags(description);
+    const newHashtags = hashtags.filter((hashtag) => !oldDescription?.includes(hashtag));
+
+    const updatedPost = await postsRepository.update({
+      postId,
+      url,
+      description,
+      hashtags: newHashtags,
+    });
     return res.send(updatedPost);
   } catch (err) {
     return res.sendStatus(500);
