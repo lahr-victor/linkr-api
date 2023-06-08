@@ -28,6 +28,16 @@ async function insertIntoPosts({ url, description, userId }) {
   return rows[0];
 }
 
+async function createRepost({ userId, postId }) {
+  const { rows } = await db.query(
+    `
+    INSERT INTO reposts("userId","postId") 
+    VALUES($1,$2) RETURNING *;`,
+    [userId, postId],
+  );
+  return rows[0];
+}
+
 async function create({
   url,
   description,
@@ -122,6 +132,7 @@ const postsRepository = {
   findById,
   validate,
   findAllPostsAndReposts,
+  createRepost,
 };
 
 export default postsRepository;

@@ -63,7 +63,9 @@ async function updatePost(req, res) {
     const oldDescription = postFound.description;
 
     const hashtags = extractHashtags(description);
-    const newHashtags = hashtags.filter((hashtag) => !oldDescription?.includes(hashtag));
+    const newHashtags = hashtags.filter(
+      (hashtag) => !oldDescription?.includes(hashtag),
+    );
 
     const updatedPost = await postsRepository.update({
       postId,
@@ -77,11 +79,36 @@ async function updatePost(req, res) {
   }
 }
 
+async function createNewRepost(req, res) {
+  const { userId } = res.locals.session;
+  const { postId } = req.params;
+  try {
+    const postFound = await postsRepository.find({ postId });
+
+    if (!postFound) return res.sendStatus(404);
+    if (postFound.userId === Number(userId)) {
+      return res.status(401).send('you cannot share your own post');
+    }
+
+    const repost = await postsRepository.createRepost({
+      userId,
+      postId,
+    });
+    return res.status(201).send(repost);
+  } catch (err) {
+    if (err.message?.includes('duplicate key')) {
+      return res.status(409).send('you already shared this post');
+    }
+    return res.sendStatus(500);
+  }
+}
+
 const postsControllers = {
   createNewPost,
   getPosts,
   deletePost,
   updatePost,
+  createNewRepost,
 };
 
 export default postsControllers;
