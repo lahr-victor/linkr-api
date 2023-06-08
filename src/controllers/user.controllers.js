@@ -38,7 +38,7 @@ async function signIn(req, res) {
     if (user && bcrypt.compareSync(password, passwordMatch)) {
       const existingSession = await userRepository.findSession(user.id);
 
-      if (existingSession) return res.status(400).send('Usuário já logado');
+      if (existingSession) await userRepository.deleteSession(user.id);
 
       await userRepository.createSession(user.id);
 
@@ -106,6 +106,16 @@ async function isFollowing(req, res) {
   }
 }
 
+async function verifyFollowing(req, res) {
+  const { userId } = res.locals.session;
+  try {
+    const follows = await userRepository.verifyFollows(userId);
+    return res.status(200).send(follows);
+  } catch (err) {
+    return res.status(422).send(err.message);
+  }
+}
+
 const userControllers = {
   signUp,
   signIn,
@@ -113,6 +123,7 @@ const userControllers = {
   followUser,
   unfollowUser,
   isFollowing,
+  verifyFollowing,
 };
 
 export default userControllers;
