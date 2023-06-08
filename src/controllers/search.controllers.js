@@ -12,8 +12,9 @@ async function getUserById(req, res) {
 
 async function searchUsersByName(req, res) {
   const { name } = req.query;
+  const { userId } = res.locals.session;
   try {
-    const users = await searchRepository.searchUserName(name);
+    const users = await searchRepository.searchUserName(name, userId);
     res.status(200).send(users);
   } catch (error) {
     res.sendStatus(500);
