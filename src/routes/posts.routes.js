@@ -33,4 +33,10 @@ postsRouter.get(
   postsControllers.getPosts,
 );
 
+postsRouter.post(
+  '/posts/:postId',
+  authValidation,
+  postsControllers.createNewRepost,
+);
+
 export default postsRouter;

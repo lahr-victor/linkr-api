@@ -22,13 +22,16 @@ async function createNewPost(req, res) {
 }
 
 async function getPosts(req, res) {
-  const { limit } = req.query;
+  const { limit, offset } = req.query;
   const { userId } = res.locals.session;
   try {
-    const posts = await postsRepository.findAllByFollow({ limit: Number(limit) || 20 }, userId);
+    const posts = await postsRepository.findAllByFollow({
+      limit,
+      offset,
+      userId,
+    });
     res.send(posts);
   } catch (err) {
-    console.log(err);
     res.sendStatus(500);
   }
 }
@@ -52,15 +55,52 @@ async function deletePost(req, res) {
 async function updatePost(req, res) {
   const { postId } = req.params;
   const { userId } = res.locals.session;
+  const { url, description } = req.body;
   try {
     const postFound = await postsRepository.find({ postId });
 
     if (!postFound) return res.sendStatus(404);
     if (postFound.userId !== Number(userId)) return res.sendStatus(401);
 
-    const updatedPost = await postsRepository.update({ postId, ...req.body });
+    const oldDescription = postFound.description;
+
+    const hashtags = extractHashtags(description);
+    const newHashtags = hashtags.filter(
+      (hashtag) => !oldDescription?.includes(hashtag),
+    );
+
+    const updatedPost = await postsRepository.update({
+      postId,
+      url,
+      description,
+      hashtags: newHashtags,
+    });
     return res.send(updatedPost);
   } catch (err) {
+    return res.sendStatus(500);
+  }
+}
+
+async function createNewRepost(req, res) {
+  const { userId } = res.locals.session;
+  const { postId } = req.params;
+  try {
+    const postFound = await postsRepository.find({ postId });
+
+    if (!postFound) return res.sendStatus(404);
+    if (postFound.userId === Number(userId)) {
+      return res.status(401).send('you cannot share your own post');
+    }
+
+    const repost = await postsRepository.createRepost({
+      userId,
+      postId,
+    });
+    return res.status(201).send(repost);
+  } catch (err) {
+    if (err.message?.includes('duplicate key')) {
+      return res.status(409).send('you already shared this post');
+    }
     return res.sendStatus(500);
   }
 }
@@ -70,6 +110,7 @@ const postsControllers = {
   getPosts,
   deletePost,
   updatePost,
+  createNewRepost,
 };
 
 export default postsControllers;

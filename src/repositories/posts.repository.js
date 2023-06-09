@@ -28,6 +28,16 @@ async function insertIntoPosts({ url, description, userId }) {
   return rows[0];
 }
 
+async function createRepost({ userId, postId }) {
+  const { rows } = await db.query(
+    `
+    INSERT INTO reposts("userId","postId") 
+    VALUES($1,$2) RETURNING *;`,
+    [userId, postId],
+  );
+  return rows[0];
+}
+
 async function create({
   url,
   description,
@@ -42,26 +52,29 @@ async function create({
   return { post, hashtags: hashtagsCreated };
 }
 
-async function findAllByFollow({ limit = 20 }, userId) {
+async function findAllByFollow({ userId, limit = 20, offset = 0 }) {
   const { rows } = await db.query(
     `SELECT 
-      posts.id,
-      posts.description,
-      posts.url, 
-      users.name AS "userName",
-      users.photo AS "userImageUrl",
-      users.id AS "userId",
-      follows."followingId"
-    FROM posts
-    JOIN users ON users.id=posts."userId" 
-    JOIN follows ON posts."userId" = follows."followerId" AND follows."followingId" = $1
-    ORDER BY posts."createdAt" DESC LIMIT $2;`,
-    [userId, limit],
+      pr.id, 
+      pr.description, 
+      pr.url, 
+      pr."userName", 
+      pr."userImageUrl", 
+      pr."userId",
+      pr."repostUserId",
+      pr."repostUserName",
+      CAST(pr."repostCount" AS INTEGER),
+      pr."createdAt"
+    FROM posts_and_reposts pr 
+    LEFT JOIN follows ON COALESCE(pr."repostUserId",pr."userId")=follows."followerId" 
+    WHERE COALESCE(pr."repostUserId",pr."userId")=$1 OR follows."followingId"=$1
+    ORDER BY "createdAt" DESC LIMIT $2 OFFSET $3;`,
+    [userId, limit, offset],
   );
   return rows;
 }
 
-async function find({ postId }) {
+async function findById({ postId }) {
   const { rows } = await db.query('SELECT * FROM posts WHERE id=$1;', [postId]);
   return rows[0];
 }
@@ -70,12 +83,18 @@ async function deleteById({ postId }) {
   await db.query('DELETE FROM posts WHERE id = $1;', [postId]);
 }
 
-async function update({ postId, url, description }) {
+async function update({
+  postId,
+  url,
+  description,
+  hashtags,
+}) {
   const { rows } = await db.query(
     'UPDATE posts SET url=$1, description=$2 WHERE id=$3 RETURNING *;',
     [url, description, postId],
   );
-  return rows[0];
+  const hashtagsCreated = await insertIntoHashtags({ hashtags, postId });
+  return { post: rows[0], hashtags: hashtagsCreated };
 }
 
 async function validate(postId) {
@@ -88,13 +107,17 @@ async function validate(postId) {
   return rows[0].exists;
 }
 
+const find = findById;
+
 const postsRepository = {
   create,
-  findAllByFollow,
   deleteById,
   update,
   find,
+  findById,
   validate,
+  findAllByFollow,
+  createRepost,
 };
 
 export default postsRepository;
