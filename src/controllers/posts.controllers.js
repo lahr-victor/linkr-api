@@ -113,6 +113,8 @@ async function latestPostsUpdate(req, res) {
       userId,
       createdAt,
     });
+    console.log(posts);
+    console.log(createdAt);
     res.send(posts);
   } catch (err) {
     res.sendStatus(500);
