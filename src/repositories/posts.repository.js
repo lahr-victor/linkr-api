@@ -93,11 +93,9 @@ async function findLatestPosts({ userId, createdAt }) {
       CAST(pr."repostCount" AS INTEGER),
       pr."createdAt"
     FROM posts_and_reposts pr 
-    LEFT JOIN follows ON COALESCE(pr."repostUserId",pr."userId")=follows."followerId" 
-    WHERE COALESCE(pr."repostUserId",pr."userId")=$1 OR follows."followingId"=$1
-
+    LEFT JOIN follows ON COALESCE(pr."repostUserId",pr."userId")=follows."followingId" 
+    WHERE (COALESCE(pr."repostUserId",pr."userId")=$1 OR follows."followerId"=$1)
     AND "createdAt" > $2
-
     ORDER BY "createdAt" DESC;`,
     [userId, createdAt],
   );
