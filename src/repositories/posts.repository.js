@@ -79,7 +79,7 @@ async function findById({ postId }) {
   return rows[0];
 }
 
-async function findLatestPosts({ userId, createdAt }) {
+async function findLatestPosts({ userId, postId, createdAt }) {
   const { rows } = await db.query(
     `SELECT 
       pr.id, 
@@ -95,9 +95,9 @@ async function findLatestPosts({ userId, createdAt }) {
     FROM posts_and_reposts pr 
     LEFT JOIN follows ON COALESCE(pr."repostUserId",pr."userId")=follows."followingId" 
     WHERE (COALESCE(pr."repostUserId",pr."userId")=$1 OR follows."followerId"=$1)
-    AND "createdAt" > $2
+    AND pr.id > $2 AND pr."createdAt" > $3
     ORDER BY "createdAt" DESC;`,
-    [userId, createdAt],
+    [userId, postId, createdAt],
   );
   return rows;
 }

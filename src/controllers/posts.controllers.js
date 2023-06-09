@@ -106,15 +106,15 @@ async function createNewRepost(req, res) {
 }
 
 async function latestPostsUpdate(req, res) {
-  const { createdAt } = req.query;
+  const { postId, createdAt } = req.query;
   const { userId } = res.locals.session;
   try {
     const posts = await postsRepository.findLatestPosts({
       userId,
+      postId,
       createdAt,
     });
-    const filter = posts.filter((post) => post.createdAt > createdAt);
-    res.send(filter);
+    res.send(posts);
   } catch (err) {
     res.sendStatus(500);
   }
