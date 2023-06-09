@@ -13,25 +13,27 @@ async function retrieveMostUsed(limit) {
   return rows;
 }
 
-async function retrievePostsBy(hashtag) {
+async function retrievePostsBy({ hashtag, limit = 20, offset = 0 }) {
   const { rows } = await db.query(
     `
     SELECT 
-      posts.id,
-      posts.description,
-      posts.url,
-      users.id AS "userId",
-      users.name AS "userName",
-      users.photo AS "userImageUrl"      
-    FROM posts 
-    JOIN users ON users.id = posts."userId"
-    JOIN hashtags ON hashtags."postId" = posts.id
-    WHERE hashtags.hashtag = $1
-    ORDER BY posts."createdAt" DESC;
+      pr.id, 
+      pr.description, 
+      pr.url, 
+      pr."userName", 
+      pr."userImageUrl", 
+      pr."userId",
+      pr."repostUserId",
+      pr."repostUserName",
+      CAST(pr."repostCount" AS INTEGER),
+      pr."createdAt"
+    FROM posts_and_reposts pr 
+    JOIN hashtags ON hashtags."postId"=pr.id
+    WHERE hashtags.hashtag=$1
+    ORDER BY "createdAt" DESC LIMIT $2 OFFSET $3;
     `,
-    [hashtag],
+    [hashtag, limit, offset],
   );
-
   return rows;
 }
 
