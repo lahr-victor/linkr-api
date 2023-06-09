@@ -113,9 +113,8 @@ async function latestPostsUpdate(req, res) {
       userId,
       createdAt,
     });
-    console.log(posts);
-    console.log(createdAt);
-    res.send(posts);
+    const filter = posts.filter((post) => post.createdAt > createdAt);
+    res.send(filter);
   } catch (err) {
     res.sendStatus(500);
   }
