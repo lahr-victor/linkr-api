@@ -15,6 +15,7 @@ commentsRouter.post(
 
 commentsRouter.get(
   '/posts/:id/comments',
+  authValidation,
   commentsControllers.retrieveComments,
 );
 

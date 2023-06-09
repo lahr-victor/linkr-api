@@ -12,7 +12,7 @@ async function add(postId, text, userId) {
   return rows[0];
 }
 
-async function retrieve(postId) {
+async function retrieve(postId, userId) {
   const { rows } = await db.query(
     `
     SELECT 
@@ -20,21 +20,20 @@ async function retrieve(postId) {
       comments.text, 
       users.id AS "userId",
       users.name AS "userName", 
-      users.photo AS "UserPicture",
+      users.photo AS "userPicture",
       EXISTS (
         SELECT * FROM posts 
         WHERE posts."userId" = comments."userId" AND posts.id = $1
       ) AS "isAuthor",
       EXISTS (
         SELECT * FROM follows 
-        JOIN posts ON posts.id = $1
-        WHERE follows."followerId" = comments."userId" AND follows."followingId" = posts."userId"
-      ) AS "isFollower"
+        WHERE follows."followerId" = $2 AND follows."followingId" = comments."userId"
+      ) AS "isFollowed"
     FROM comments
     JOIN users ON users.id = comments."userId"
     WHERE comments."postId" = $1;
     `,
-    [postId],
+    [postId, userId],
   );
 
   return rows;

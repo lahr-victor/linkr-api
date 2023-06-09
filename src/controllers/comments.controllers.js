@@ -33,7 +33,7 @@ async function retrieveComments(req, res) {
   try {
     const comments = await commentsRepository.retrieve(postId);
 
-    return res.status(200).send({ comments });
+    return res.status(200).send(comments);
   } catch (err) {
     return res.status(500).send(err.message);
   }
