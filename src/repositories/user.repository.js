@@ -28,21 +28,21 @@ async function deleteSession(userId) {
   await db.query('DELETE FROM sessions WHERE "userId"=$1;', [userId]);
 }
 
-async function followUser(followingId, followerId) {
-  await db.query('INSERT INTO follows ("followingId", "followerId") VALUES ($1, $2);', [followingId, followerId]);
+async function followUser(followerId, followingId) {
+  await db.query('INSERT INTO follows ("followerId", "followingId") VALUES ($1, $2);', [followerId, followingId]);
 }
 
-async function unfollowUser(unfollowingId, unfollowerId) {
-  await db.query('DELETE FROM follows WHERE "followingId"=$1 AND "followerId"=$2;', [unfollowingId, unfollowerId]);
+async function unfollowUser(unfollowerId, unfollowingId) {
+  await db.query('DELETE FROM follows WHERE "followerId"=$1 AND "followingId"=$2;', [unfollowerId, unfollowingId]);
 }
 
-async function isFollowing(followingId, followerId) {
-  const { rows } = await db.query('SELECT * FROM follows WHERE "followingId"=$1 AND "followerId"=$2;', [followingId, followerId]);
+async function isFollowing(followerId, followingId) {
+  const { rows } = await db.query('SELECT * FROM follows WHERE "followerId"=$1 AND "followingId"=$2;', [followerId, followingId]);
   return rows[0];
 }
 
 async function verifyFollows(userId) {
-  const { rows } = await db.query('SELECT * FROM follows WHERE "followingId"=$1;', [userId]);
+  const { rows } = await db.query('SELECT * FROM follows WHERE "followerId"=$1;', [userId]);
   return rows;
 }
 

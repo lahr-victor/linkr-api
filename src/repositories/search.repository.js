@@ -9,19 +9,19 @@ async function searchUserName(name, userId) {
       users.id,
       users.name,
       users.photo,
-      follows."followingId"
+      follows."followerId"
     FROM
       users
     LEFT JOIN
       follows
     ON
-      users.id = follows."followerId" AND follows."followingId" = $1
+      users.id = follows."followingId" AND follows."followerId" = $1
     WHERE
       users.name
     ILIKE 
       $2
     ORDER BY
-      "followingId"
+      "followerId"
     ;`,
     [userId, pattern],
   );
