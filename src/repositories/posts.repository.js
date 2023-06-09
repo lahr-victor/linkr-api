@@ -66,7 +66,8 @@ async function findAllByFollow({ userId, limit = 20, offset = 0 }) {
       CAST(pr."repostCount" AS INTEGER),
       pr."createdAt"
     FROM posts_and_reposts pr 
-    JOIN follows ON pr."userId"=follows."followerId" AND follows."followingId"=$1
+    JOIN follows ON COALESCE(pr."repostUserId",pr."userId")=follows."followerId" 
+    AND follows."followingId"=$1
     ORDER BY "createdAt" DESC LIMIT $2 OFFSET $3;`,
     [userId, limit, offset],
   );
