@@ -22,12 +22,10 @@ async function createNewPost(req, res) {
 }
 
 async function getPosts(req, res) {
-  const { limit, offset } = req.query;
+  const { limit } = req.query;
+  const { userId } = res.locals.session;
   try {
-    const posts = await postsRepository.findAll({
-      limit,
-      offset,
-    });
+    const posts = await postsRepository.findAllByFollow({ limit: Number(limit) || 20 }, userId);
     res.send(posts);
   } catch (err) {
     console.log(err);
