@@ -52,23 +52,7 @@ async function create({
   return { post, hashtags: hashtagsCreated };
 }
 
-async function findAll({ limit = 20, offset = 0 }) {
-  const { rows } = await db.query(
-    `SELECT 
-      posts.id,
-      posts.description,
-      posts.url, 
-      users.name AS "userName",
-      users.photo AS "userImageUrl",
-      users.id AS "userId"
-    FROM posts JOIN users ON users.id=posts."userId" 
-    ORDER BY posts."createdAt" DESC LIMIT $1 OFFSET $2;`,
-    [limit, offset],
-  );
-  return rows;
-}
-
-async function findAllPostsAndReposts({ limit = 20, offset = 0 }) {
+async function findAllByFollow({ userId, limit = 20, offset = 0 }) {
   const { rows } = await db.query(
     `SELECT 
       pr.id, 
@@ -82,8 +66,9 @@ async function findAllPostsAndReposts({ limit = 20, offset = 0 }) {
       CAST(pr."repostCount" AS INTEGER),
       pr."createdAt"
     FROM posts_and_reposts pr 
-    ORDER BY "createdAt" DESC LIMIT $1 OFFSET $2;`,
-    [limit, offset],
+    JOIN follows ON pr."userId"=follows."followerId" AND follows."followingId"=$1
+    ORDER BY "createdAt" DESC LIMIT $2 OFFSET $3;`,
+    [userId, limit, offset],
   );
   return rows;
 }
@@ -125,13 +110,12 @@ const find = findById;
 
 const postsRepository = {
   create,
-  findAll,
   deleteById,
   update,
   find,
   findById,
   validate,
-  findAllPostsAndReposts,
+  findAllByFollow,
   createRepost,
 };
 

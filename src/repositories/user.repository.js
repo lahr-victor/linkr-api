@@ -41,6 +41,11 @@ async function isFollowing(followingId, followerId) {
   return rows[0];
 }
 
+async function verifyFollows(userId) {
+  const { rows } = await db.query('SELECT * FROM follows WHERE "followingId"=$1;', [userId]);
+  return rows;
+}
+
 const userRepository = {
   findUser,
   createUser,
@@ -50,6 +55,7 @@ const userRepository = {
   followUser,
   unfollowUser,
   isFollowing,
+  verifyFollows,
 };
 
 export default userRepository;

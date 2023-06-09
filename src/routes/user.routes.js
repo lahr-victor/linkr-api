@@ -12,5 +12,6 @@ userRouter.delete('/log-out', authValidation, userControllers.logOut);
 userRouter.post('/user/:followerId', authValidation, userControllers.followUser);
 userRouter.delete('/user/:unfollowerId', authValidation, userControllers.unfollowUser);
 userRouter.get('/user/:followerId', authValidation, userControllers.isFollowing);
+userRouter.get('/verify-follow', authValidation, userControllers.verifyFollowing);
 
 export default userRouter;

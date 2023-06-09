@@ -28,6 +28,7 @@ postsRouter.put(
 
 postsRouter.get(
   '/posts',
+  authValidation,
   schemaMiddleware.validateQuery(postSchema.query),
   postsControllers.getPosts,
 );
