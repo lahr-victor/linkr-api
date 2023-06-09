@@ -39,4 +39,10 @@ postsRouter.post(
   postsControllers.createNewRepost,
 );
 
+postsRouter.get(
+  '/latestPostsUpdate',
+  authValidation,
+  postsControllers.latestPostsUpdate,
+);
+
 export default postsRouter;

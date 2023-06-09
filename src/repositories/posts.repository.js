@@ -79,6 +79,29 @@ async function findById({ postId }) {
   return rows[0];
 }
 
+async function findLatestPosts({ userId, postId, createdAt }) {
+  const { rows } = await db.query(
+    `SELECT 
+      pr.id, 
+      pr.description, 
+      pr.url, 
+      pr."userName", 
+      pr."userImageUrl", 
+      pr."userId",
+      pr."repostUserId",
+      pr."repostUserName",
+      CAST(pr."repostCount" AS INTEGER),
+      pr."createdAt"
+    FROM posts_and_reposts pr 
+    LEFT JOIN follows ON COALESCE(pr."repostUserId",pr."userId")=follows."followingId" 
+    WHERE (COALESCE(pr."repostUserId",pr."userId")=$1 OR follows."followerId"=$1)
+    AND pr.id > $2 AND pr."createdAt" > $3
+    ORDER BY "createdAt" DESC;`,
+    [userId, postId, createdAt],
+  );
+  return rows;
+}
+
 async function deleteById({ postId }) {
   await db.query('DELETE FROM posts WHERE id = $1;', [postId]);
 }
@@ -118,6 +141,7 @@ const postsRepository = {
   validate,
   findAllByFollow,
   createRepost,
+  findLatestPosts,
 };
 
 export default postsRepository;

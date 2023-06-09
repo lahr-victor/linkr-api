@@ -105,12 +105,28 @@ async function createNewRepost(req, res) {
   }
 }
 
+async function latestPostsUpdate(req, res) {
+  const { postId, createdAt } = req.query;
+  const { userId } = res.locals.session;
+  try {
+    const posts = await postsRepository.findLatestPosts({
+      userId,
+      postId,
+      createdAt,
+    });
+    res.send(posts);
+  } catch (err) {
+    res.sendStatus(500);
+  }
+}
+
 const postsControllers = {
   createNewPost,
   getPosts,
   deletePost,
   updatePost,
   createNewRepost,
+  latestPostsUpdate,
 };
 
 export default postsControllers;
