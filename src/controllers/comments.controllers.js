@@ -24,6 +24,8 @@ async function addComment(req, res) {
 }
 
 async function retrieveComments(req, res) {
+  const { userId } = res.locals.session;
+
   const postId = parseInt(req.params.id, 10);
   if (Number.isNaN(postId)) return res.sendStatus(400);
 
@@ -31,7 +33,7 @@ async function retrieveComments(req, res) {
   if (!valid) return res.sendStatus(404);
 
   try {
-    const comments = await commentsRepository.retrieve(postId);
+    const comments = await commentsRepository.retrieve(postId, userId);
 
     return res.status(200).send(comments);
   } catch (err) {
