@@ -43,25 +43,25 @@ async function searchUserId(id) {
   return rows[0];
 }
 
-async function searchPostsById(id, { limit = 20 }) {
+async function searchPostsById({ userId, limit = 20, offset = 0 }) {
   const { rows } = await db.query(
     `
-      SELECT
-      posts.id,
-      posts.description,
-      posts.url, 
-      users.name AS "userName",
-      users.photo AS "userImageUrl",
-      users.id AS "userId"
-        FROM
-        posts
-        JOIN users ON posts."userId" = users.id
-        WHERE
-        posts."userId" = $1
-        ORDER BY posts."createdAt"
-        DESC LIMIT $2
-      ;`,
-    [id, limit],
+    SELECT 
+      pr.id, 
+      pr.description, 
+      pr.url, 
+      pr."userName", 
+      pr."userImageUrl", 
+      pr."userId",
+      pr."repostUserId",
+      pr."repostUserName",
+      CAST(pr."repostCount" AS INTEGER),
+      pr."createdAt"
+    FROM posts_and_reposts pr 
+    WHERE COALESCE(pr."repostUserId",pr."userId")=$1
+    ORDER BY "createdAt" DESC LIMIT $2 OFFSET $3;
+    ;`,
+    [userId, limit, offset],
   );
   return rows;
 }

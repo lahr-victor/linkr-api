@@ -23,9 +23,13 @@ async function searchUsersByName(req, res) {
 
 async function searchPostsById(req, res) {
   const { id } = req.params;
-  const { limit } = req.query;
+  const { limit, offset } = req.query;
   try {
-    const post = await searchRepository.searchPostsById(id, { limit: Number(limit) || 20 });
+    const post = await searchRepository.searchPostsById({
+      userId: id,
+      limit,
+      offset,
+    });
     res.status(200).send(post);
   } catch (error) {
     res.sendStatus(500);
