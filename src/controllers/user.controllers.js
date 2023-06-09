@@ -66,13 +66,13 @@ async function logOut(req, res) {
 
 async function followUser(req, res) {
   const { userId } = res.locals.session;
-  const followingId = userId;
-  const { followerId } = req.params;
+  const followerId = userId;
+  const { followingId } = req.params;
 
   if (followingId === followerId) return res.status(422).send('Não é possível seguir a si mesmo');
 
   try {
-    await userRepository.followUser(followingId, followerId);
+    await userRepository.followUser(followerId, followingId);
     return res.status(200).send(true);
   } catch (err) {
     return res.status(422).send(err.message);
@@ -81,11 +81,11 @@ async function followUser(req, res) {
 
 async function unfollowUser(req, res) {
   const { userId } = res.locals.session;
-  const unfollowingId = userId;
-  const { unfollowerId } = req.params;
+  const unfollowerId = userId;
+  const { unfollowingId } = req.params;
 
   try {
-    await userRepository.unfollowUser(unfollowingId, unfollowerId);
+    await userRepository.unfollowUser(unfollowerId, unfollowingId);
     return res.status(200).send(false);
   } catch (err) {
     return res.status(422).send(err.message);
@@ -94,11 +94,11 @@ async function unfollowUser(req, res) {
 
 async function isFollowing(req, res) {
   const { userId } = res.locals.session;
-  const followingId = userId;
-  const { followerId } = req.params;
+  const followerId = userId;
+  const { followingId } = req.params;
 
   try {
-    const following = await userRepository.isFollowing(followingId, followerId);
+    const following = await userRepository.isFollowing(followerId, followingId);
     if (following) return res.status(200).send(true);
     return res.status(200).send(false);
   } catch (err) {

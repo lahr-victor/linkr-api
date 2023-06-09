@@ -71,6 +71,7 @@ async function findAllByFollow({ userId, limit = 20, offset = 0 }) {
     ORDER BY "createdAt" DESC LIMIT $2 OFFSET $3;`,
     [userId, limit, offset],
   );
+  console.log(rows);
   return rows;
 }
 
